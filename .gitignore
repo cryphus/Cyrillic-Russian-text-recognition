@@ -1,0 +1,33 @@
+# Python cache / compiled files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model weights / large artifacts
+*.hdf5
+*.keras
+*.ckpt
+
+# IDE / tooling
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Logs / misc
+*.log
+logs/
+
+
