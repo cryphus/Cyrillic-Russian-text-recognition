@@ -3,7 +3,6 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense, LSTM
 from tensorflow.keras.models import Model
 import tensorflow.keras.layers as layers
-from tensorflow.keras.applications import ResNet50
 import tensorflow.keras
 import tensorflow.keras.backend as K
 import os
@@ -46,7 +45,6 @@ class CTCLayer(layers.Layer):
         return y_pred
 
 def create_model():
-    """Создает и возвращает модель"""
     vocab_list = ["\u0425", "!", "\u043b", "N", "\u0414", "c", "\u041a", "'", "a", "5", "6", "s", "\u044b", "\u0417", "\u044e", "\u0445", ":", "\u041e", "\u0422", "\u0449", "\u0401", " ", "\u043a", "\u0441", "=", "+", "\u0432", "\u0426", "\u0444", "\u0447", "\u042b", "[", "\u0418", "B", "\u0433", "4", "\u0435", "\u0443", "7", "?", "\u044a", ")", "\u0442", "\u044c", "\u0427", "\u0424", "\u0411", "\u0437", "\u043c", "\u041c", "I", "O", "9", "\u0416", "\u042e", "}", "\u0429", "\u043d", "n", "3", ",", "\u0439", "\u044f", "]", "\u041f", "\u0438", "\u2116", "\u0421", "\"", "t", "V", "(", "\u043f", "\u0440", "e", "l", "r", "\u0448", "\u0431", "M", "/", "\u0415", "2", "\u042d", "\u0434", "\u0436", "_", "\u042f", "|", "\u0410", "0", "\u041b", "\u0420", "8", ";", "1", "-", "<", "\u0451", "\u0430", "z", "\u044d", "b", "\u0423", "\u0446", "\u0428", "\u0412", "\u043e", ">", ".", "\u041d", "\u0413", "T", "p", "*", "k", "y", "F", "A", "H", "u", "v", "g", "K", "f", "D", "d", "R", "L", "q", "\u042c", "Y", "X", "C", "i", "o", "S", "J", "G", "%", "w", "x", "U", "E", "j", "h", "m", "W", "P"]
     
     char_to_num = tf.keras.layers.experimental.preprocessing.StringLookup(vocabulary=vocab_list, mask_token=None)
@@ -101,14 +99,12 @@ def create_model():
     return model, num_to_char
 
 def load_model_weights(model, weights_path="model.h5"):
-    """Загружает веса модели"""
     if os.path.exists(weights_path):
         model.load_weights(weights_path)
         return True
     return False
 
 def decode_batch_predictions(pred, num_to_char):
-    """Декодирует предсказания модели в текст"""
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
 
     results = tf.keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][0][
@@ -122,7 +118,6 @@ def decode_batch_predictions(pred, num_to_char):
     return output_text
 
 def recognize_images(image_paths, prediction_model, num_to_char, progress_callback=None):
-    """Распознает текст на изображениях"""
     if not image_paths:
         return []
     
@@ -151,23 +146,23 @@ def recognize_images(image_paths, prediction_model, num_to_char, progress_callba
 class RecognitionApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("📝 Распознавание рукописного русского текста")
+        self.root.title("Распознавание рукописного русского текста")
         self.root.geometry("900x700")
-        self.root.configure(bg="#f0f0f0")
+        self.root.configure(bg="#fafafa")
         
         self.colors = {
-            'bg': '#f0f0f0',
-            'primary': '#2196F3',
-            'primary_hover': '#1976D2',
-            'success': '#4CAF50',
-            'success_hover': '#45a049',
-            'danger': '#f44336',
-            'danger_hover': '#da190b',
+            'bg': '#fafafa',
+            'primary': '#000000',
+            'primary_hover': '#333333',
+            'success': '#000000',
+            'success_hover': '#333333',
+            'danger': '#666666',
+            'danger_hover': '#888888',
             'card_bg': '#ffffff',
-            'text_primary': '#212121',
-            'text_secondary': '#757575',
-            'border': '#e0e0e0',
-            'accent': '#FF9800'
+            'text_primary': '#1a1a1a',
+            'text_secondary': '#666666',
+            'border': '#e5e5e5',
+            'accent': '#000000'
         }
         
         self.image_paths = []
@@ -179,16 +174,15 @@ class RecognitionApp:
         self.load_model_in_background()
     
     def create_button(self, parent, text, command, bg_color, hover_color, width=20):
-        """Создает стильную кнопку"""
         btn = tk.Button(
             parent,
             text=text,
             command=command,
-            font=("Segoe UI", 11, "bold"),
+            font=("Segoe UI", 10),
             bg=bg_color,
             fg="white",
-            padx=25,
-            pady=12,
+            padx=20,
+            pady=10,
             width=width,
             relief=tk.FLAT,
             cursor="hand2",
@@ -209,19 +203,17 @@ class RecognitionApp:
         return btn
     
     def create_card(self, parent, padx=20, pady=10):
-        """Создает карточку с рамкой"""
         frame = tk.Frame(
             parent,
             bg=self.colors['card_bg'],
             relief=tk.FLAT,
             bd=1,
             highlightbackground=self.colors['border'],
-            highlightthickness=1
+            highlightthickness=0
         )
         return frame
     
     def setup_ui(self):
-        """Настраивает интерфейс"""
         main_container = tk.Frame(self.root, bg=self.colors['bg'])
         main_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         
@@ -230,81 +222,81 @@ class RecognitionApp:
         
         title_label = tk.Label(
             header_frame,
-            text="📝 Распознавание рукописного русского текста",
-            font=("Segoe UI", 18, "bold"),
+            text="Распознавание рукописного русского текста",
+            font=("Segoe UI", 16),
             bg=self.colors['card_bg'],
             fg=self.colors['text_primary'],
-            pady=20
+            pady=24
         )
         title_label.pack()
         
         subtitle_label = tk.Label(
             header_frame,
             text="Загрузите изображения и получите распознанный текст",
-            font=("Segoe UI", 10),
+            font=("Segoe UI", 9),
             bg=self.colors['card_bg'],
             fg=self.colors['text_secondary']
         )
-        subtitle_label.pack(pady=(0, 15))
+        subtitle_label.pack(pady=(0, 20))
         
         buttons_card = self.create_card(main_container)
         buttons_card.pack(fill=tk.X, pady=(0, 15))
         
         buttons_frame = tk.Frame(buttons_card, bg=self.colors['card_bg'])
-        buttons_frame.pack(pady=20, padx=20)
+        buttons_frame.pack(pady=16, padx=20)
         
         self.load_button = self.create_button(
             buttons_frame,
-            "📁 Загрузить изображения",
+            "Загрузить изображения",
             self.load_images,
             self.colors['success'],
             self.colors['success_hover'],
-            width=25
+            width=22
         )
-        self.load_button.pack(side=tk.LEFT, padx=10)
+        self.load_button.pack(side=tk.LEFT, padx=8)
         
         self.recognize_button = self.create_button(
             buttons_frame,
-            "🔍 Распознать текст",
+            "Распознать текст",
             self.recognize_images_threaded,
             self.colors['primary'],
             self.colors['primary_hover'],
-            width=25
+            width=22
         )
-        self.recognize_button.pack(side=tk.LEFT, padx=10)
+        self.recognize_button.pack(side=tk.LEFT, padx=8)
         self.recognize_button.config(state=tk.DISABLED)
         
         clear_button = self.create_button(
             buttons_frame,
-            "🗑️ Очистить",
+            "Очистить",
             self.clear_all,
             self.colors['danger'],
             self.colors['danger_hover'],
-            width=15
+            width=14
         )
-        clear_button.pack(side=tk.LEFT, padx=10)
+        clear_button.pack(side=tk.LEFT, padx=8)
         
         status_card = self.create_card(main_container)
         status_card.pack(fill=tk.X, pady=(0, 15))
         
         status_frame = tk.Frame(status_card, bg=self.colors['card_bg'])
-        status_frame.pack(pady=15, padx=20, fill=tk.X)
+        status_frame.pack(pady=12, padx=20, fill=tk.X)
         
         status_title = tk.Label(
             status_frame,
             text="Статус:",
-            font=("Segoe UI", 10, "bold"),
+            font=("Segoe UI", 9),
             bg=self.colors['card_bg'],
             fg=self.colors['text_primary']
         )
-        status_title.pack(side=tk.LEFT, padx=(0, 10))
+        status_title.pack(side=tk.LEFT, padx=(0, 8))
         
         self.status_label = tk.Label(
             status_frame,
             text="Загрузка модели...",
-            font=("Segoe UI", 10),
+            font=("Segoe UI", 9),
             bg=self.colors['card_bg'],
-            fg="#2196F3"
+            fg=self.colors['text_secondary']
         )
         self.status_label.pack(side=tk.LEFT)
         
@@ -323,8 +315,8 @@ class RecognitionApp:
         
         images_title = tk.Label(
             images_header,
-            text="📋 Загруженные изображения:",
-            font=("Segoe UI", 11, "bold"),
+            text="Загруженные изображения",
+            font=("Segoe UI", 10),
             bg=self.colors['card_bg'],
             fg=self.colors['text_primary']
         )
@@ -335,7 +327,7 @@ class RecognitionApp:
         
         self.count_label = tk.Label(
             count_label_frame,
-            text="(0 файлов)",
+            text="0 файлов",
             font=("Segoe UI", 9),
             bg=self.colors['card_bg'],
             fg=self.colors['text_secondary']
@@ -350,15 +342,14 @@ class RecognitionApp:
         
         self.images_listbox = tk.Listbox(
             listbox_frame,
-            font=("Segoe UI", 10),
-            bg="#fafafa",
+            font=("Segoe UI", 9),
+            bg="#ffffff",
             fg=self.colors['text_primary'],
             selectbackground=self.colors['primary'],
             selectforeground="white",
             relief=tk.FLAT,
             bd=0,
-            highlightthickness=1,
-            highlightbackground=self.colors['border'],
+            highlightthickness=0,
             yscrollcommand=scrollbar.set,
             height=4
         )
@@ -373,8 +364,8 @@ class RecognitionApp:
         
         results_title = tk.Label(
             results_header,
-            text="📄 Результаты распознавания:",
-            font=("Segoe UI", 11, "bold"),
+            text="Результаты распознавания",
+            font=("Segoe UI", 10),
             bg=self.colors['card_bg'],
             fg=self.colors['text_primary']
         )
@@ -385,16 +376,15 @@ class RecognitionApp:
         
         self.results_text = scrolledtext.ScrolledText(
             text_frame,
-            font=("Consolas", 11),
-            bg="#fafafa",
+            font=("Segoe UI", 10),
+            bg="#ffffff",
             fg=self.colors['text_primary'],
             relief=tk.FLAT,
             bd=0,
-            highlightthickness=1,
-            highlightbackground=self.colors['border'],
+            highlightthickness=0,
             wrap=tk.WORD,
-            padx=15,
-            pady=15
+            padx=16,
+            pady=16
         )
         self.results_text.pack(fill=tk.BOTH, expand=True)
         
@@ -402,15 +392,14 @@ class RecognitionApp:
         self.results_text.config(state=tk.DISABLED)
     
     def load_model_in_background(self):
-        """Загружает модель в фоновом потоке"""
         def load():
             try:
-                self.root.after(0, lambda: self.status_label.config(text="Создание модели...", fg="#2196F3"))
+                self.root.after(0, lambda: self.status_label.config(text="Создание модели...", fg=self.colors['text_secondary']))
                 self.root.after(0, lambda: self.progress.start())
                 
                 model, num_to_char = create_model()
                 
-                self.root.after(0, lambda: self.status_label.config(text="Загрузка весов модели...", fg="#2196F3"))
+                self.root.after(0, lambda: self.status_label.config(text="Загрузка весов модели...", fg=self.colors['text_secondary']))
                 
                 if load_model_weights(model, "model.h5"):
                     self.prediction_model = tf.keras.models.Model(
@@ -421,25 +410,24 @@ class RecognitionApp:
                     self.model_loaded = True
                     
                     self.root.after(0, lambda: self.progress.stop())
-                    self.root.after(0, lambda: self.status_label.config(text="✅ Модель загружена успешно!", fg="#4CAF50"))
+                    self.root.after(0, lambda: self.status_label.config(text="Модель загружена успешно", fg=self.colors['text_primary']))
                     
                     if self.image_paths:
                         self.root.after(0, lambda: self.recognize_button.config(state=tk.NORMAL))
                 else:
                     self.root.after(0, lambda: self.progress.stop())
-                    self.root.after(0, lambda: self.status_label.config(text="❌ Ошибка: файл model.h5 не найден!", fg="#f44336"))
+                    self.root.after(0, lambda: self.status_label.config(text="Ошибка: файл model.h5 не найден", fg=self.colors['text_primary']))
                     self.root.after(0, lambda: messagebox.showerror("Ошибка", "Файл model.h5 не найден в текущей директории!"))
             except Exception as e:
                 self.root.after(0, lambda: self.progress.stop())
                 error_msg = f"Ошибка загрузки модели: {str(e)}"
-                self.root.after(0, lambda: self.status_label.config(text=f"❌ {error_msg}", fg="#f44336"))
+                self.root.after(0, lambda: self.status_label.config(text=error_msg, fg=self.colors['text_primary']))
                 self.root.after(0, lambda: messagebox.showerror("Ошибка", f"Не удалось загрузить модель:\n{str(e)}"))
         
         thread = threading.Thread(target=load, daemon=True)
         thread.start()
     
     def load_images(self):
-        """Открывает диалог выбора изображений"""
         filetypes = [
             ("Изображения", "*.png *.jpg *.jpeg *.bmp *.gif"),
             ("PNG файлы", "*.png"),
@@ -457,17 +445,16 @@ class RecognitionApp:
             self.images_listbox.delete(0, tk.END)
             for path in self.image_paths:
                 filename = os.path.basename(path)
-                self.images_listbox.insert(tk.END, f"  📷 {filename}")
+                self.images_listbox.insert(tk.END, filename)
             
-            self.count_label.config(text=f"({len(self.image_paths)} файлов)")
+            self.count_label.config(text=f"{len(self.image_paths)} файлов")
             
             if self.model_loaded:
                 self.recognize_button.config(state=tk.NORMAL)
             else:
-                self.status_label.config(text="⏳ Ожидание загрузки модели...", fg="#FF9800")
+                self.status_label.config(text="Ожидание загрузки модели...", fg=self.colors['text_secondary'])
     
     def recognize_images_threaded(self):
-        """Запускает распознавание в отдельном потоке"""
         if not self.image_paths:
             messagebox.showwarning("Предупреждение", "Пожалуйста, сначала загрузите изображения!")
             return
@@ -479,11 +466,11 @@ class RecognitionApp:
         def recognize():
             try:
                 self.root.after(0, lambda: self.recognize_button.config(state=tk.DISABLED))
-                self.root.after(0, lambda: self.status_label.config(text="🔄 Распознавание...", fg="#2196F3"))
+                self.root.after(0, lambda: self.status_label.config(text="Распознавание...", fg=self.colors['text_secondary']))
                 self.root.after(0, lambda: self.progress.start())
                 
                 def progress_callback(message):
-                    self.root.after(0, lambda: self.status_label.config(text=f"🔄 {message}", fg="#2196F3"))
+                    self.root.after(0, lambda: self.status_label.config(text=message, fg=self.colors['text_secondary']))
                 
                 results = recognize_images(self.image_paths, self.prediction_model, 
                                           self.num_to_char, progress_callback)
@@ -493,7 +480,7 @@ class RecognitionApp:
             except Exception as e:
                 error_msg = f"Ошибка при распознавании: {str(e)}"
                 self.root.after(0, lambda: self.progress.stop())
-                self.root.after(0, lambda: self.status_label.config(text=f"❌ {error_msg}", fg="#f44336"))
+                self.root.after(0, lambda: self.status_label.config(text=error_msg, fg=self.colors['text_primary']))
                 self.root.after(0, lambda: messagebox.showerror("Ошибка", error_msg))
                 self.root.after(0, lambda: self.recognize_button.config(state=tk.NORMAL))
         
@@ -501,37 +488,35 @@ class RecognitionApp:
         thread.start()
     
     def display_results(self, results):
-        """Отображает результаты распознавания"""
         self.progress.stop()
         self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
         
         if not results:
-            self.results_text.insert(tk.END, "❌ Не удалось распознать текст на изображениях.\n")
-            self.status_label.config(text="⚠️ Распознавание завершено с ошибками", fg="#FF9800")
+            self.results_text.insert(tk.END, "Не удалось распознать текст на изображениях.\n")
+            self.status_label.config(text="Распознавание завершено с ошибками", fg=self.colors['text_primary'])
         else:
             for i, (path, text) in enumerate(zip(self.image_paths, results), 1):
                 filename = os.path.basename(path)
-                self.results_text.insert(tk.END, f"📷 Изображение {i}: {filename}\n", "header")
-                self.results_text.insert(tk.END, f"📝 Распознанный текст:\n", "label")
+                self.results_text.insert(tk.END, f"Изображение {i}: {filename}\n", "header")
+                self.results_text.insert(tk.END, f"Распознанный текст:\n", "label")
                 self.results_text.insert(tk.END, f"{text}\n\n", "text")
-                self.results_text.insert(tk.END, "─" * 60 + "\n\n", "separator")
+                self.results_text.insert(tk.END, "\n", "separator")
             
-            self.status_label.config(text=f"✅ Распознавание завершено! Обработано изображений: {len(results)}", fg="#4CAF50")
+            self.status_label.config(text=f"Распознавание завершено. Обработано изображений: {len(results)}", fg=self.colors['text_primary'])
         
-        self.results_text.tag_config("header", font=("Segoe UI", 11, "bold"), foreground=self.colors['primary'])
-        self.results_text.tag_config("label", font=("Segoe UI", 10, "bold"), foreground=self.colors['text_primary'])
-        self.results_text.tag_config("text", font=("Consolas", 11), foreground=self.colors['text_primary'])
+        self.results_text.tag_config("header", font=("Segoe UI", 10), foreground=self.colors['text_primary'])
+        self.results_text.tag_config("label", font=("Segoe UI", 9), foreground=self.colors['text_secondary'])
+        self.results_text.tag_config("text", font=("Segoe UI", 10), foreground=self.colors['text_primary'])
         self.results_text.tag_config("separator", foreground=self.colors['border'])
         
         self.results_text.config(state=tk.DISABLED)
         self.recognize_button.config(state=tk.NORMAL)
     
     def clear_all(self):
-        """Очищает все данные"""
         self.image_paths = []
         self.images_listbox.delete(0, tk.END)
-        self.count_label.config(text="(0 файлов)")
+        self.count_label.config(text="0 файлов")
         
         self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
@@ -539,7 +524,7 @@ class RecognitionApp:
         self.results_text.config(state=tk.DISABLED)
         
         if self.model_loaded:
-            self.status_label.config(text="✅ Модель готова к работе", fg="#4CAF50")
+            self.status_label.config(text="Модель готова к работе", fg=self.colors['text_primary'])
             self.recognize_button.config(state=tk.DISABLED)
 
 def main():
